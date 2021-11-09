@@ -1,6 +1,10 @@
 #include "SpellChecker.h"
 #include "Utils.h"
-#include<stdio.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+
 //
 // SYNOPSIS: count_typos dict_filename text_filename [stats_output]
 //   cmd-line arguments:

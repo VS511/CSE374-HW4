@@ -3,6 +3,8 @@
 #include "SpellChecker.h"
 #include "Utils.h"
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAX_WORD_SIZE 128
 #define DEFAULT_DICT_SIZE (1 << 16)  // same as 2^16, an arbitrary starting size
