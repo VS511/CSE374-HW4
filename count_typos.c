@@ -1,5 +1,6 @@
-# include "SpellChecker.h"
-# include "Utils.h"
+#include "SpellChecker.h"
+#include "Utils.h"
+#include<stdio.h>
 //
 // SYNOPSIS: count_typos dict_filename text_filename [stats_output]
 //   cmd-line arguments:

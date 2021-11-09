@@ -1,3 +1,5 @@
+#include <stddef.h>
+#include <stdio.h>
 // Module for binary-search-lookup dictionary
 // Declarations of functions in the spellchecker module
 //

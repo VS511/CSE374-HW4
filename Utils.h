@@ -13,6 +13,7 @@
 
 #ifndef UTILS
 #define UTILS
+#include <stdio.h>
 
 
 // params:
