@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   // create the file for typos output, its name should be the input with the
   // ".typos" suffix appended
   FILE* typos_output = NULL;
-  char* typos_filename = (char*) malloc(strlen(input_filename));
+  char* typos_filename = (char*) malloc(strlen(input_filename)*sizeof(*typos_filename));
   strcpy(typos_filename, input_filename);
   strcat(typos_filename, TYPOS_SUFFIX);
   typos_output = fopen(typos_filename, "w");
@@ -123,6 +123,7 @@ int main(int argc, char* argv[]) {
 
 
   // TODO: Free all allocated resources.
+  free(typos_filename);
 
   return EXIT_SUCCESS;
 }

@@ -60,6 +60,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
 
   // clean up
   free(buffer);
+  //free(word);
   return word_count;
 }
 
