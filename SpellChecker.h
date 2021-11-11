@@ -34,7 +34,7 @@ size_t build_dictionary(char *filename, Dictionary* dict_result);
 // params:
 //      dict:   the dictionary to be freed
 //      size:   the size of the dictionary
-void free_dictionary(Dictionary dict, size_t size);
+void free_dictionary(Dictionary *dict, size_t size);
 
 // returns 1 if the word exists in the dictionary,
 //         0 otherwise

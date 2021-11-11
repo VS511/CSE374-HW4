@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
   // create the file for typos output, its name should be the input with the
   // ".typos" suffix appended
   FILE* typos_output = NULL;
-  char* typos_filename = (char*) malloc(strlen(input_filename)*sizeof(*typos_filename));
+  char* typos_filename = (char*) malloc(strlen(input_filename)*sizeof(char));
   strcpy(typos_filename, input_filename);
   strcat(typos_filename, TYPOS_SUFFIX);
   typos_output = fopen(typos_filename, "w");
@@ -94,6 +94,8 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "Failed to build a dictionary from %s.\n", dict_filename);
     return EXIT_FAILURE;
   }
+
+  
 
   // process the file
   get_word(buf, MAX_WORD_LENGTH, text);
@@ -112,6 +114,9 @@ int main(int argc, char* argv[]) {
     }
     get_word(buf, MAX_WORD_LENGTH, text);
   }
+  free_dictionary(&dict, dict_size);
+  fclose(typos_output);
+  fclose(text);
 
   // compensate for the offset by 1 of paragraph count
   if (word_count != 0) {

@@ -41,7 +41,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
       dict = (Dictionary) realloc(dict, dict_size * 2);
     }
     // save the word in a new allocated space and put it into the dictionary
-    word = malloc(sizeof(char) * word_len);
+    word = malloc(sizeof(char) * (word_len));
     strncpy(word, buffer, word_len + 1);
     dict[word_count] = word;
 
@@ -53,6 +53,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
       buffer[word_len] = '\0';
     }
     word_count++;
+    free(word);
   }
 
   // assign to output parameter
@@ -60,11 +61,11 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
 
   // clean up
   free(buffer);
-  //free(word);
+  free(dict);
   return word_count;
 }
 
-void free_dictionary(Dictionary dict, size_t size) {
+void free_dictionary(Dictionary *dict, size_t size) {
   // To free the dictionary, we need to free the block allocated to every word
   for (size_t i = 0; i < size; i++) {
     free(dict[i]);
