@@ -68,7 +68,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
 void free_dictionary(Dictionary *dict, size_t size) {
   // To free the dictionary, we need to free the block allocated to every word
   for (size_t i = 0; i < size; i++) {
-    free(dict[i]);
+    free(*dict[i]);
   }
 }
 
