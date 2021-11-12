@@ -26,8 +26,6 @@
 //    after the original filename.
 //
 
-// TODO: Import libraries needed to compile
-
 #define TYPOS_SUFFIX ".typos"
 #define MAX_WORD_LENGTH 128
 
@@ -79,7 +77,8 @@ int main(int argc, char* argv[]) {
   // create the file for typos output, its name should be the input with the
   // ".typos" suffix appended
   FILE* typos_output = NULL;
-  char* typos_filename = (char*) malloc(strlen(input_filename)*sizeof(char));
+  char* typos_filename = (char*) malloc(((strlen(input_filename) + 1) + 
+                          strlen(TYPOS_SUFFIX))*sizeof(char));
   strcpy(typos_filename, input_filename);
   strcat(typos_filename, TYPOS_SUFFIX);
   typos_output = fopen(typos_filename, "w");
