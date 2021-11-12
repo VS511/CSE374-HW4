@@ -113,14 +113,8 @@ int main(int argc, char* argv[]) {
     }
     get_word(buf, MAX_WORD_LENGTH, text);
   }
-  free_dictionary(dict, dict_size);
-  // free(dict);
+  free_dictionary(&dict, dict_size);
   fclose(typos_output);
-
-  if (argc == 4) {
-    fclose(stats_output);
-  }
-  
   fclose(text);
 
   // compensate for the offset by 1 of paragraph count
@@ -132,6 +126,7 @@ int main(int argc, char* argv[]) {
   }
 
 
+  // TODO: Free all allocated resources.
   free(typos_filename);
 
   return EXIT_SUCCESS;
