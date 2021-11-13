@@ -98,8 +98,12 @@ int main(int argc, char* argv[]) {
   FILE* typos_output = NULL;
   char* typos_filename = (char*) malloc(((strlen(input_filename) + 1) +
                           strlen(TYPOS_SUFFIX))*sizeof(char));
-  strcpy(typos_filename, input_filename);
+  snprintf(typos_filename, MAX_WORD_LENGTH, input_filename);
   strcat(typos_filename, TYPOS_SUFFIX);
+
+  // typos_filename += snprintf(typos_filename,
+  // MAX_WORD_LENGTH, "%s", TYPOS_SUFFIX);
+
   typos_output = fopen(typos_filename, "w");
   if (!typos_output) {
     fprintf(stderr, "Failed to create %s for typos output.\n", typos_filename);

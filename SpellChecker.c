@@ -8,6 +8,10 @@
 #define MAX_WORD_SIZE 128
 #define DEFAULT_DICT_SIZE (1 << 16)  // same as 2^16, an arbitrary starting size
 
+// Copyright 2021 "David Maltby & Vaibhav Singh"
+//
+// This file implements the SpellChecker
+
 size_t build_dictionary(char* filename, Dictionary* dict_result) {
   // allocate space for the dictionary
   size_t dict_size = DEFAULT_DICT_SIZE;
