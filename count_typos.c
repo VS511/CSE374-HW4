@@ -5,6 +5,7 @@
 #include "SpellChecker.h"
 #include "Utils.h"
 
+// Copyright 2021 "David Maltby & Vaibhav Singh"
 //
 // SYNOPSIS: count_typos dict_filename text_filename [stats_output]
 //   cmd-line arguments:
@@ -95,7 +96,7 @@ int main(int argc, char* argv[]) {
   // create the file for typos output, its name should be the input with the
   // ".typos" suffix appended
   FILE* typos_output = NULL;
-  char* typos_filename = (char*) malloc(((strlen(input_filename) + 1) + 
+  char* typos_filename = (char*) malloc(((strlen(input_filename) + 1) +
                           strlen(TYPOS_SUFFIX))*sizeof(char));
   strcpy(typos_filename, input_filename);
   strcat(typos_filename, TYPOS_SUFFIX);
