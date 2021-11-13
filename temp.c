@@ -1,151 +1,97 @@
+// TODO: Import libraries needed to compile.
+#include <stdio.h>
 #include "SpellChecker.h"
 #include "Utils.h"
-#include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
-//
-// SYNOPSIS: count_typos dict_filename text_filename [stats_output]
-//   cmd-line arguments:
-//     dict_filename: the name of the dictionary used to check correct words.
-//     text_filename: the name of the file that contains the English plaintext
-//                    to run the program on.
-//     stats_output: specifies the file to which the program writes the
-//                   statistics output. If not provided, those output will be
-//                   directed to stdout.
-//
-// Generates statistics for words, paragraphs and typos in the given file.
-//  A word consists on only alphabet characters, and paragraphs are delimited
-//  by an instance of "\n\n".
-//
-// Outputs:
-//  - The statistics, to standard output or to a specified file.
-//  - There will be a file created in the same directory as the text file, with
-//    the same filename except that this output file has a .typos extension
-//    after the original filename.
-//
+#define MAX_WORD_SIZE 128
+#define DEFAULT_DICT_SIZE (1 << 16)  // same as 2^16, an arbitrary starting size
 
-#define TYPOS_SUFFIX ".typos"
-#define MAX_WORD_LENGTH 128
+size_t build_dictionary(char* filename, Dictionary* dict_result) {
+  // allocate space for the dictionary
+  size_t dict_size = DEFAULT_DICT_SIZE;
+  Dictionary dict = (Dictionary) malloc(sizeof(char*) * dict_size);
 
-// Prints a usage message to stderr
-void usage(char* program);
+  // create a buffer to store the lines
+  char* buffer = (char*) malloc(MAX_WORD_SIZE);
+  size_t buffer_len = MAX_WORD_SIZE;
 
-// Formats and prints the given statistics to the given stream.
-void show_results(FILE* stream,
-                  int word_count, int paragraph_count, int typo_count);
-
-int main(int argc, char* argv[]) {
-  Dictionary dict;
-  size_t dict_size;
-  char buf[MAX_WORD_LENGTH];  // buffer for processing words
-
-  // statistics variables
-  int paragraph_count, word_count, typo_count;
-  paragraph_count = word_count = typo_count = 0;
-
-  // argument check
-  if (argc != 3 && argc != 4) {
-    // Print usage and exit
-    usage(argv[0]);
+  // open the file for reading
+  FILE* input = fopen(filename, "r");
+  if (!input) {
+    return 0;
   }
 
-  char* input_filename = argv[2];
-
-  // open the input text file
-  FILE* text = fopen(input_filename, "r");
-  if (!text) {
-    fprintf(stderr, "Failed to open %s for input.\n", input_filename);
-    return EXIT_FAILURE;
+  size_t word_count = 0;
+  char* line = fgets(buffer, buffer_len, input);
+  size_t word_len = strlen(buffer);
+  // needs to check for \n at the end because fgets reads in \n as well
+  if (buffer[word_len - 1] == '\n') {
+    // Remove the newline from the word
+    buffer[word_len - 1] = '\0';
+    word_len--;
   }
-
-  // open the file for statistics output, or use stdout if not provided
-  FILE* stats_output;
-  if (argc == 4) {
-    char* stats_filename = argv[3];
-    stats_output = fopen(stats_filename, "w");
-    if (!stats_output) {
-      fprintf(stderr, "Failed to open %s for statistics output. Using stdout\n",
-                      stats_filename);
-      stats_output = stdout;
+  char* word;
+  while (line) {  // line is not NULL
+    // double the dictionary size if it's full
+    if (word_count == dict_size) {
+      dict_size *= 2;
+      dict = (Dictionary) realloc(dict, dict_size * 2);
     }
-  } else {
-    stats_output = stdout;
-  }
+    // save the word in a new allocated space and put it into the dictionary
+    word = (char*) malloc(sizeof(char) * (word_len + 1));
+    strncpy(word, buffer, word_len + 1);
+    dict[word_count] = word;
 
-  // create the file for typos output, its name should be the input with the
-  // ".typos" suffix appended
-  FILE* typos_output = NULL;
-  char* typos_filename = (char*) malloc(((strlen(input_filename) + 1) + 
-                          strlen(TYPOS_SUFFIX))*sizeof(char));
-  strcpy(typos_filename, input_filename);
-  strcat(typos_filename, TYPOS_SUFFIX);
-  typos_output = fopen(typos_filename, "w");
-  if (!typos_output) {
-    fprintf(stderr, "Failed to create %s for typos output.\n", typos_filename);
-  }
-
-  // build the dictionary
-  char* dict_filename = argv[1];
-  dict_size = build_dictionary(dict_filename, &dict);
-  if (!dict_size) {
-    fprintf(stderr, "Failed to build a dictionary from %s.\n", dict_filename);
-    return EXIT_FAILURE;
-  }
-
-  
-
-  // process the file
-  get_word(buf, MAX_WORD_LENGTH, text);
-  while (buf[0] != '\0') {
-    if (buf[0] == '\n') {  // a new paragraph
-      paragraph_count++;
-    } else {  // a new word
-      word_count++;
-      // spell check
-      if (!check_spelling(dict, dict_size, buf)) {
-        if (typos_output) {
-          fprintf(typos_output, "%s\n", buf);
-        }
-        typo_count++;
-      }
+    // go to the next line
+    line = fgets(buffer, buffer_len, input);
+    word_len = strlen(buffer);
+    if (buffer[word_len - 1] == '\n') {
+      word_len--;
+      buffer[word_len] = '\0';
     }
-    get_word(buf, MAX_WORD_LENGTH, text);
-  }
-  free_dictionary(&dict, dict_size);
-  fclose(typos_output);
-  fclose(text);
-
-  // compensate for the offset by 1 of paragraph count
-  if (word_count != 0) {
-    paragraph_count++;
-    show_results(stats_output, word_count, paragraph_count, typo_count);
-  } else {
-    printf("The text is empty.\n");
+    word_count++;
+    // free(word);
   }
 
+  // assign to output parameter
+  *dict_result = dict;
 
-  // TODO: Free all allocated resources.
-  free(typos_filename);
-
-  return EXIT_SUCCESS;
+  // clean up
+  free(buffer);
+  fclose(input);
+  // free(dict);
+  return word_count;
 }
 
-void show_results(FILE* stream,
-                  int word_count, int paragraph_count, int typo_count) {
-  fprintf(stream, "General Statistics\n");
-  fprintf(stream, "\t%d words found in the text.\n", word_count);
-  fprintf(stream, "\t%d paragraphs found in the text.\n", paragraph_count);
-  fprintf(stream, "Typos Statistics\n");
-  fprintf(stream, "\t%d mistyped words found in the text.\n", typo_count);
-  fprintf(stream, "\tThere is a typo in every %lf words.\n",
-          (double) word_count / typo_count);
-  fprintf(stream, "\tIn every paragraph, there are %lf typo(s).\n",
-          (double) typo_count / paragraph_count);
+void free_dictionary(Dictionary dict, size_t size) {
+  // To free the dictionary, we need to free the block allocated to every word
+  for (size_t i = 0; i < size; i++) {
+    free(dict[i]);
+  }
+  free(dict);
 }
 
-void usage(char* program) {
-  printf("Usage: %s dictionary input_text [output]\n", program);
-  exit(EXIT_FAILURE);
+int check_spelling(Dictionary dict, size_t size, char* word) {
+  int lo = 0, hi = size - 1;
+  int mid;
+  int cmp_result;
+
+  // typical binary search
+  do {
+    mid = (lo + hi) / 2;
+    cmp_result = strcmp(word, dict[mid]);
+    if (cmp_result == 0) {
+      return 1;
+    } else if (cmp_result > 0) {
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  } while (lo <= hi);
+
+  // didn't find a match
+  return 0;
 }
