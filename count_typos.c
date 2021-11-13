@@ -114,7 +114,6 @@ int main(int argc, char* argv[]) {
     get_word(buf, MAX_WORD_LENGTH, text);
   }
   free_dictionary(dict, dict_size);
-  free(dict);
   fclose(typos_output);
 
   if (argc == 4) {

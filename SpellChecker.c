@@ -15,7 +15,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
   Dictionary dict = (Dictionary) malloc(sizeof(char*) * dict_size);
 
   // create a buffer to store the lines
-  char* buffer = (char*) malloc(MAX_WORD_SIZE);
+  char* buffer = (char*) malloc(sizeof(char) * MAX_WORD_SIZE);
   size_t buffer_len = MAX_WORD_SIZE;
 
   // open the file for reading
@@ -38,7 +38,7 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
     // double the dictionary size if it's full
     if (word_count == dict_size) {
       dict_size *= 2;
-      dict = (Dictionary) realloc(dict, dict_size * 2);
+      dict = (Dictionary) realloc(dict, sizeof(char*) * (dict_size * 2));
     }
     // save the word in a new allocated space and put it into the dictionary
     word = (char*) malloc(sizeof(char) * (word_len + 1));
@@ -53,7 +53,6 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
       buffer[word_len] = '\0';
     }
     word_count++;
-    // free(word);
   }
 
   // assign to output parameter
@@ -62,7 +61,6 @@ size_t build_dictionary(char* filename, Dictionary* dict_result) {
   // clean up
   free(buffer);
   fclose(input);
-  // free(dict);
   return word_count;
 }
 
