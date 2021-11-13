@@ -36,6 +36,24 @@ void usage(char* program);
 void show_results(FILE* stream,
                   int word_count, int paragraph_count, int typo_count);
 
+void show_results(FILE* stream,
+                  int word_count, int paragraph_count, int typo_count) {
+  fprintf(stream, "General Statistics\n");
+  fprintf(stream, "\t%d words found in the text.\n", word_count);
+  fprintf(stream, "\t%d paragraphs found in the text.\n", paragraph_count);
+  fprintf(stream, "Typos Statistics\n");
+  fprintf(stream, "\t%d mistyped words found in the text.\n", typo_count);
+  fprintf(stream, "\tThere is a typo in every %lf words.\n",
+          (double) word_count / typo_count);
+  fprintf(stream, "\tIn every paragraph, there are %lf typo(s).\n",
+          (double) typo_count / paragraph_count);
+}
+
+void usage(char* program) {
+  printf("Usage: %s dictionary input_text [output]\n", program);
+  exit(EXIT_FAILURE);
+}
+
 int main(int argc, char* argv[]) {
   Dictionary dict;
   size_t dict_size;
@@ -94,8 +112,6 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  
-
   // process the file
   get_word(buf, MAX_WORD_LENGTH, text);
   while (buf[0] != '\0') {
@@ -114,12 +130,8 @@ int main(int argc, char* argv[]) {
     get_word(buf, MAX_WORD_LENGTH, text);
   }
   free_dictionary(dict, dict_size);
-  fclose(typos_output);
 
-  if (argc == 4) {
-    fclose(stats_output);
-  }
-  
+  fclose(typos_output);
   fclose(text);
 
   // compensate for the offset by 1 of paragraph count
@@ -130,26 +142,11 @@ int main(int argc, char* argv[]) {
     printf("The text is empty.\n");
   }
 
+  if (argc == 4) {
+    fclose(stats_output);
+  }
 
   free(typos_filename);
 
   return EXIT_SUCCESS;
-}
-
-void show_results(FILE* stream,
-                  int word_count, int paragraph_count, int typo_count) {
-  fprintf(stream, "General Statistics\n");
-  fprintf(stream, "\t%d words found in the text.\n", word_count);
-  fprintf(stream, "\t%d paragraphs found in the text.\n", paragraph_count);
-  fprintf(stream, "Typos Statistics\n");
-  fprintf(stream, "\t%d mistyped words found in the text.\n", typo_count);
-  fprintf(stream, "\tThere is a typo in every %lf words.\n",
-          (double) word_count / typo_count);
-  fprintf(stream, "\tIn every paragraph, there are %lf typo(s).\n",
-          (double) typo_count / paragraph_count);
-}
-
-void usage(char* program) {
-  printf("Usage: %s dictionary input_text [output]\n", program);
-  exit(EXIT_FAILURE);
 }
